@@ -23,3 +23,21 @@ A binary file stores data in a format not directly readable by humans. It typica
 
 **Summary:**  
 Both DLLs and static libraries contain pre-compiled, machine-readable instructions, making them binary files. The main difference is **when and how** their code is linked to your application.
+
+
+## Understanding `gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);`
+
+* **`glfwGetProcAddress`** → a *function* provided by GLFW that, given a string like `"glGenBuffers"`, **returns the function pointer** to that OpenGL call from the graphics driver.
+
+* **`GLADloadproc`** → a *typedef for a function pointer type*. GLAD wants “a function that, given a name, returns the address of that OpenGL function.” It doesn’t care where it comes from.
+
+* **`gladLoadGLLoader`** → the *initializer function* in GLAD. It takes a `GLADloadproc` function pointer (in this case, `glfwGetProcAddress`), then **queries and stores all the OpenGL function pointers** so you can use them later in your program.
+
+* The **cast** `(GLADloadproc)glfwGetProcAddress` is just a way to tell the compiler: “yes, `glfwGetProcAddress` matches the signature GLAD expects — treat it as such.”
+
+So the workflow is:
+
+```
+Your code → gladLoadGLLoader → uses glfwGetProcAddress → GPU driver → returns real OpenGL function addresses
+```
+
