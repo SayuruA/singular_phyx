@@ -4,7 +4,8 @@
 void Base3D::setupBuffers(){
     // check vertices and indices validity - raise error if not
     if (vertices.empty() or indices.empty()){
-        throw std::invalid_argument("Requested buffer init with empty data vectors!");
+        std::cerr << "Requested buffer init with empty data vectors!";
+        throw;
     }
 
     // check vao is already set - return early if so
@@ -34,7 +35,12 @@ void Base3D::setupBuffers(){
     glBindVertexArray(0);
 }
 
+
 void Base3D::draw() const{
+    if (VAO == 0) {
+        std::cerr << "Warning: Attempting to draw uninitialized object\n";
+        throw;
+    }
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
     glBindVertexArray(0);
@@ -42,20 +48,22 @@ void Base3D::draw() const{
 
 
 Base3D::~Base3D(){
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-    glDeleteVertexArrays(1, &VAO);
+    if (VAO) glDeleteBuffers(1, &VBO);
+    if (VBO) glDeleteBuffers(1, &VBO);
+    if (EBO) glDeleteBuffers(1, &EBO);
+    if (VAO) glDeleteVertexArrays(1, &VAO);
 }
 
 Sphere::Sphere(std::array<float, 3>&& c, float r, unsigned int res)
-    : center(std::move(c)), radius(r), resolution(res) {
+    : Base3D(), center(std::move(c)), radius(r), resolution(res) {
+
+        if (resolution == 0) {
+            throw std::invalid_argument("Resolution must be > 0");
+        }
 
         generateGeometry();
-        try{
-            setupBuffers();
-        }catch(const std::invalid_argument& e){
-            std::cerr << e.what() << std::endl;
-        }
+        setupBuffers();
+        
 }
 
 // //override
@@ -66,6 +74,10 @@ Sphere::Sphere(std::array<float, 3>&& c, float r, unsigned int res)
 void Sphere::generateGeometry() { 
     // This returns vertices and indices arrays (as one list) for a sphere having center and radius given.
     // resoultion is the number of splits taken in the angle in both directions
+
+    if (resolution == 0) {
+        throw std::invalid_argument("Resolution must be > 0");
+    }
 
     const float PI = 3.14159265359f;
 

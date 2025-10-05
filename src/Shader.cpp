@@ -10,7 +10,9 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
     std::string fragCode = readFile(fragmentPath);
 
     if (vertCode.empty() || fragCode.empty()) {
-    std::cerr << "Shader source empty. Check file paths.\n";
+        std::cerr << "Shader source empty. Check file paths.\n";
+        ID = 0;
+        throw;
     }
 
 
