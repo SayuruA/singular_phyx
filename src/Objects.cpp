@@ -8,7 +8,7 @@ void Base3D::setupBuffers(){
     }
 
     // check vao is already set - return early if so
-    if (VAO) return;
+    if (VAO != 0) return;
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);

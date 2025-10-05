@@ -17,6 +17,8 @@ protected:
 
     unsigned int VAO, VBO, EBO;
 
+    // do not change as 0 initialization is required
+    Base3D() : VAO(0), VBO(0), EBO(0) {}
     virtual void generateGeometry() = 0;  // pure virt
 
     void setupBuffers();                  // shared
@@ -35,7 +37,7 @@ protected:
     float radius; 
     unsigned int resolution;
 
-    void draw() const override;
+    // void draw() const override;
     void generateGeometry() override;
 
 public:
