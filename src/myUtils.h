@@ -1,5 +1,5 @@
-#ifndef MY_UTILS_PHY_ENG
-#define MY_UTILS_PHY_ENG
+#ifndef MY_UTILS_GRPX_ENG
+#define MY_UTILS_GRPX_ENG
 
 #include <glad/glad.h>
 #include <GLFW3/glfw3.h>
@@ -28,17 +28,21 @@ void showFPS(GLFWwindow* window) {
     }
 }
 
+/*
 class Sphere{
 public:
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
 
+
+
     // use move to prevent unnessary copying
     // '&&' makes sure constructor only accepts rvalues 
     Sphere(std::vector<float>&& v, std::vector<unsigned int>&& i)
         : vertices(std::move(v)), indices(std::move(i)) {}
-};
+    
 
+};
 
 
 Sphere createSphere(std::array<float, 3> center, float radius, unsigned int resolution){
@@ -106,5 +110,6 @@ Sphere createSphere(std::array<float, 3> center, float radius, unsigned int reso
 
     return Sphere{ std::move(vertices), std::move(indices) };
 }
+*/
 
 #endif

@@ -15,6 +15,7 @@
 
 // --------------------------------------
 #include "Shader.h"
+#include "Objects.h"
 #include "myUtils.h"
 
 int main() {
@@ -99,8 +100,10 @@ int main() {
 
     // sphere 
     std::array<float, 3> center1 = {0., 0.0, 0.0};
-    auto sphere1 = createSphere(center1, 0.2, 100);
+    Sphere s1(std::move(center1), 0.2, 100);
+    Base3D& obj1 = s1; 
 
+    /*
     // Create VAO, VBO, EBO
     GLuint VAOs, VBOs, EBOs;
     glGenVertexArrays(1, &VAOs);
@@ -125,7 +128,7 @@ int main() {
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
-
+    */
 
     // Shader shader("../src/shader.vert", "../src/shader.frag");
     Shader shader3d("../shaders/shader3d.vert", "../shaders/shader3d.frag");
@@ -182,18 +185,23 @@ int main() {
         glUniformMatrix4fv(locProj,  1, GL_FALSE, glm::value_ptr(projection));
         glUniform3f(colorLoc, 1.0f, 1.0f, 0.2f);
 
-        glBindVertexArray(VAOs);
-        glDrawElements(GL_TRIANGLES,  sphere1.indices.size(), GL_UNSIGNED_INT, 0); // 4 faces * 3 indices = 12
-        glBindVertexArray(0);
+        // glBindVertexArray(VAOs);
+        // glDrawElements(GL_TRIANGLES,  sphere1.indices.size(), GL_UNSIGNED_INT, 0); // 4 faces * 3 indices = 12
+        // glBindVertexArray(0);
+        obj1.draw();
+
+
         showFPS(window);
         glfwSwapBuffers(window);
     }
 
     // cleanup
     // Shader program deleted in Shader destructor
-    glDeleteBuffers(1, &VBOs);
-    glDeleteBuffers(1, &EBOs);
-    glDeleteVertexArrays(1, &VAOs);
+    // buffers should be deleted by base3d destructor
+    // glDeleteBuffers(1, &VBOs);
+    // glDeleteBuffers(1, &EBOs);
+    // glDeleteVertexArrays(1, &VAOs);
+
 
     glfwDestroyWindow(window);
     glfwTerminate();

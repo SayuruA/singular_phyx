@@ -1,4 +1,4 @@
-# test_1
+# graphics25
 
 ## Build Instructions
 
@@ -35,5 +35,9 @@
   ```sh
   del test.exe
   ```
+
+## Resources
+
+- [Generating vertices for spheres](https://www.songho.ca/opengl/gl_sphere.html)
 
 ---

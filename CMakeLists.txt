@@ -15,7 +15,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 link_directories(${GLFW_ROOT}/build/src)
 
 # --- Your executable ---
-add_executable(test src/test.cpp src/glad.c src/Shader.cpp)
+add_executable(test src/test.cpp src/glad.c src/Shader.cpp src/Objects.cpp)
 
 # Link GLFW and system dependencies
 target_link_libraries(test glfw3)
