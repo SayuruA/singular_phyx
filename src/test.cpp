@@ -72,36 +72,11 @@ int main() {
     //     1,3,2   // bottom face (base)
     // };
 
-    // Create VAO, VBO, EBO
-    // GLuint VAO, VBO, EBO;
-    // glGenVertexArrays(1, &VAO);
-    // glGenBuffers(1, &VBO);
-    // glGenBuffers(1, &EBO);
-
-    // // bind & fill
-    // glBindVertexArray(VAO);
-
-    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // // attribute 0: position (vec3) -> offset 0
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    // glEnableVertexAttribArray(0);
-
-    // // attribute 1: color (vec3) -> offset 3 * float
-    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    // glEnableVertexAttribArray(1);
-
-    // glBindVertexArray(0);
-
-
-    // sphere 
-    std::array<float, 3> center1 = {0., 0.0, 0.0};
-    Sphere s1(std::move(center1), 0.2, 100);
-    Base3D& obj1 = s1; 
+    // sphere - orbiting object
+    float x =-3.0;
+    std::array<float, 3> center1 = {0.0f, 0.0f, 0.0f};
+    Sphere s1(std::move(center1), 0.1, 15);
+    Base3D& obj1 = s1;
 
     /*
     // Create VAO, VBO, EBO
@@ -126,17 +101,11 @@ int main() {
     // attribute 0: position (vec3) -> offset 0
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
     glBindVertexArray(0);
-    */
 
-    // Shader shader("../src/shader.vert", "../src/shader.frag");
     Shader shader3d("../shaders/shader3d.vert", "../shaders/shader3d.frag");
 
-    // if (!shader.getID()) {
-    //     std::cerr << "Failed to create shader program\n";
-    //     return -1;
-    // }
+
     if (!shader3d.getID()) {
         std::cerr << "Failed to create shader program\n";
         return -1;

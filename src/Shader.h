@@ -1,5 +1,6 @@
-#ifndef MY_SHADER
-#define MY_SHADER
+#ifndef MY_SHADERG_RPX_ENG
+#define MY_SHADER_GRPX_ENG
+
 #include <string>
 #include <glad/glad.h>
 
@@ -14,4 +15,6 @@ private:
     std::string readFile(const char* filePath);
     GLuint compileShader(GLenum type, const char* src);
 };
+
+
 #endif
