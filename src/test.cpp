@@ -17,6 +17,7 @@
 #include "Shader.h"
 #include "Objects.h"
 #include "myUtils.h"
+#include "phyx.h"
 
 int main() {
     // std::cout << "WTF??";
@@ -78,28 +79,38 @@ int main() {
     Sphere s1(std::move(center1), 0.1, 15);
     Base3D& obj1 = s1;
 
-    /*
-    // Create VAO, VBO, EBO
-    GLuint VAOs, VBOs, EBOs;
-    glGenVertexArrays(1, &VAOs);
-    glGenBuffers(1, &VBOs);
-    glGenBuffers(1, &EBOs);
+    // sphere - gravity point (static at origin)
+    std::array<float, 3> center_gravity = {0.0f, 0.0f, 0.0f};
+    Sphere s_gravity(std::move(center_gravity), 0.4, 15);
+    Base3D& obj_gravity = s_gravity;
 
-    // bind & fill
-    glBindVertexArray(VAOs);
+    // physics object - state that will be updated
+    PhysObj p_obj1 = PhysObj(glm::vec3(x, 0.0f, 0.0f), glm::vec3(0.0f, 1.4f, 0.0f), 1.0f); // 0.9 //1.4
+    
+    // create physics universe with gravity point at origin
+    std::vector<PhysObj*> objects = {&p_obj1};
+    Physx_Universe_One_GPoint universe(std::move(objects), glm::vec3(0.0f, 0.0f, 0.0f));
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBOs);
-    float* verts = sphere1.vertices.data();
-    unsigned int* inds = sphere1.indices.data();
+    // interpolation state
+    glm::vec3 prev_position = p_obj1.position;
+    glm::vec3 curr_position = p_obj1.position;
+    int frame_counter = 0;
 
-
-    glBufferData(GL_ARRAY_BUFFER,  sphere1.vertices.size() * sizeof(float), verts, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphere1.indices.size() * sizeof(unsigned int), inds, GL_STATIC_DRAW);
-
-    // attribute 0: position (vec3) -> offset 0
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // trajectory tracking
+    const size_t MAX_TRAJECTORY_POINTS = 500;
+    std::vector<glm::vec3> trajectory_points;
+    trajectory_points.push_back(p_obj1.position);
+    
+    // trajectory VAO/VBO for line rendering
+    unsigned int traj_VAO, traj_VBO;
+    glGenVertexArrays(1, &traj_VAO);
+    glGenBuffers(1, &traj_VBO);
+    
+    glBindVertexArray(traj_VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, traj_VBO);
+    glBufferData(GL_ARRAY_BUFFER, MAX_TRAJECTORY_POINTS * sizeof(glm::vec3), nullptr, GL_DYNAMIC_DRAW);
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
@@ -119,15 +130,42 @@ int main() {
     GLint colorLoc = glGetUniformLocation(shader3d.getID(), "sphereColor");
 
     // main loop
+    // update physics for every 20 th frame, linearly move in between
     while (!glfwWindowShouldClose(window)) {
+
+        // compute simple transforms
+        float time = (float)glfwGetTime();
+
+        // Update physics every..
+        const uint8_t update_every = 20;
+        const float FIXED_DT = 0.016f;
+
+        if (frame_counter % update_every == 0) {
+            prev_position = curr_position;
+            universe.linear_step(FIXED_DT);  // ~20 frames at 60fps ~= 0.33s
+            curr_position = p_obj1.position;
+        }
+
+        // Interpolation factor [0, 1] within the 20-frame window
+        float alpha = (float) (frame_counter % update_every) / update_every;
+        glm::vec3 interpolated_position = glm::mix(prev_position, curr_position, alpha);
+
+        // Record trajectory every frame (with minimum distance threshold)
+        if (trajectory_points.empty() || glm::distance(trajectory_points.back(), interpolated_position) > 0.05f) {
+            trajectory_points.push_back(interpolated_position);
+            if (trajectory_points.size() > MAX_TRAJECTORY_POINTS) {
+                trajectory_points.erase(trajectory_points.begin());
+            }
+        }
+
+        frame_counter++;
         glfwPollEvents();
 
         // clear color + depth
         glClearColor(0.12f, 0.12f, 0.12f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // compute simple transforms
-        float time = (float)glfwGetTime();
+        
       
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
@@ -157,14 +195,39 @@ int main() {
         // glBindVertexArray(VAOs);
         // glDrawElements(GL_TRIANGLES,  sphere1.indices.size(), GL_UNSIGNED_INT, 0); // 4 faces * 3 indices = 12
         // glBindVertexArray(0);
+        obj_gravity.draw();
+
+        model = glm::translate(glm::mat4(1.0f), interpolated_position);
+
+
+        glUniformMatrix4fv(locModel, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(locView,  1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(locProj,  1, GL_FALSE, glm::value_ptr(projection));
+        glUniform3f(colorLoc, 0.1f, 0.1f, 1.0f);
+
         obj1.draw();
 
+        // Draw trajectory
+        if (trajectory_points.size() > 1) {
+            glBindBuffer(GL_COPY_WRITE_BUFFER, traj_VBO);
+            glBufferSubData(GL_COPY_WRITE_BUFFER, 0, trajectory_points.size() * sizeof(glm::vec3), trajectory_points.data());
+            
+            glm::mat4 model_traj = glm::mat4(1.0f);
+            glUniformMatrix4fv(locModel, 1, GL_FALSE, glm::value_ptr(model_traj));
+            glUniform3f(colorLoc, 0.5f, 0.8f, 0.2f);  // greenish
+            
+            glBindVertexArray(traj_VAO);
+            glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)trajectory_points.size());
+            glBindVertexArray(0);
+        }
 
         showFPS(window);
         glfwSwapBuffers(window);
     }
 
     // cleanup
+    glDeleteBuffers(1, &traj_VBO);
+    glDeleteVertexArrays(1, &traj_VAO);
     // Shader program deleted in Shader destructor
     // buffers should be deleted by base3d destructor
     // glDeleteBuffers(1, &VBOs);
