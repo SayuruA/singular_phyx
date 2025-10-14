@@ -26,6 +26,9 @@ public:
     virtual void setupBuffers() = 0;
     void updateModel(glm::mat4 mod);
     void updateColor(glm::vec3 col);
+
+    virtual ~RenderObj() = default; // make sure to always have a destructor if planning to 
+                                    // ..utilize polymorphism.
 };
 
 class Locus: public RenderObj{
@@ -37,6 +40,8 @@ public:
     void draw(GLint locModel, GLint colorLoc) const override final;
     void setupBuffers() override final;
     void updateLocus(glm::vec3& interpolated_position);
+
+    ~Locus();
 };
 
 

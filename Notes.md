@@ -19,6 +19,9 @@ A binary file stores data in a format not directly readable by humans. It typica
 - **How they work:** The code is copied and embedded into the final executable during the linking phase, resulting in a larger executable that does **not** depend on external library files at runtime.
 - **Format:** Also compiled into machine-readable binary.
 
+### Polymorphism - Miscellaneous
+- Use virtual and default on base class destructors. This will ensure derived class destructors are called correctly, from top-most derived class down to base class.
+
 ---
 
 **Summary:**  

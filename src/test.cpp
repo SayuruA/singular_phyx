@@ -56,6 +56,8 @@ int main() {
     glDisable(GL_CULL_FACE);
 
 
+    {
+
     // Tetrahedron definition: 4 unique vertices, with per-vertex color
     // Vertex order: x,y,z, r,g,b
     // float vertices[] = {
@@ -78,8 +80,8 @@ int main() {
     // std::array<float, 3> center1 = {0.0f, 0.0f, 0.0f};
     // Sphere s1(std::move(center1), 0.1, 15);
     // Base3D& obj1 = s1;
-    glm::vec3 start_pos1 = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 start_vel1 = glm::vec3(0.0f, 0.f, 0.8f);
+    glm::vec3 start_pos1 = glm::vec3(-3.0f, 0.0f, 0.0f);
+    glm::vec3 start_vel1 = glm::vec3(0.0f, 0.7f, 0.0f);
     float mass1 = 1.0f;
     float radius1 = 0.1f;
     Celestial c_earth = Celestial(start_pos1, start_vel1, mass1, radius1, true);
@@ -89,10 +91,10 @@ int main() {
     // std::array<float, 3> center_gravity = {0.0f, 0.0f, 0.0f};
     // Sphere s_gravity(std::move(center_gravity), 0.4, 15);
     // Base3D& obj_gravity = s_gravity;
-    glm::vec3 start_pos2 = glm::vec3(-3.0f,0.0f,0.0f);
-    glm::vec3 start_vel2 = glm::vec3(0.0f,0.0f,0.6f);
-    float mass2 = 1.0f;
-    float radius2 = 0.1f;
+    glm::vec3 start_pos2 = glm::vec3(0.0f,0.0f,0.0f);
+    glm::vec3 start_vel2 = glm::vec3(0.0f,0.0f,0.0f);
+    float mass2 = 1e5;
+    float radius2 = 0.3f;
     Celestial c_sun = Celestial(start_pos2, start_vel2, mass2, radius2, true);
 
     // physics object - state that will be updated
@@ -260,8 +262,9 @@ int main() {
         frame_counter++;
 
     }
-
+    } // end of scoping.. cleanup will happen now as universe and shader gets deleted.
     // cleanup
+    
     // glDeleteBuffers(1, &traj_VBO);
     // glDeleteVertexArrays(1, &traj_VAO);
     // Shader program deleted in Shader destructor

@@ -108,6 +108,15 @@ Base3D::~Base3D(){
     if (VBO) glDeleteBuffers(1, &VBO);
     if (EBO) glDeleteBuffers(1, &EBO);
     if (VAO) glDeleteVertexArrays(1, &VAO);
+    std::cout << "Base3D buffer deleted successfully\n";
+}
+
+Locus::~Locus(){
+    if (VAO) glDeleteBuffers(1, &VBO);
+    if (VBO) glDeleteBuffers(1, &VBO);
+    if (VAO) glDeleteVertexArrays(1, &VAO);
+    std::cout << "Locus buffer deleted successfully\n";
+
 }
 
 Sphere::Sphere(float r, unsigned int res, glm::vec3&& c)
