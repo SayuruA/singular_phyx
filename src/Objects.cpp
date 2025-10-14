@@ -1,6 +1,15 @@
 #include "Objects.h"
 #include <stdexcept>
 
+
+void RenderObj::updateModel(glm::mat4 mod){
+    model = mod;
+}
+
+void RenderObj::updateColor(glm::vec3 col){
+    color = col;
+}
+
 void Base3D::setupBuffers(){
     // check vertices and indices validity - raise error if not
     if (vertices.empty() or indices.empty()){
@@ -19,11 +28,11 @@ void Base3D::setupBuffers(){
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    float* verts = vertices.data();
+    glm::vec3* verts = vertices.data();
     unsigned int* inds = indices.data();
 
     // note to self - better way to take the size than vertices.size() * sizeof(float) ??? - issue - dtype hardcoded
-    glBufferData(GL_ARRAY_BUFFER,  vertices.size() * sizeof(float), verts, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER,  vertices.size() * sizeof(glm::vec3), verts, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), inds, GL_STATIC_DRAW);
@@ -35,17 +44,64 @@ void Base3D::setupBuffers(){
     glBindVertexArray(0);
 }
 
+void Locus::setupBuffers(){
 
-void Base3D::draw() const{
+    // check vao is already set - return early if so
+    if (VAO != 0) return;
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, MAX_TRAJECTORY_POINTS * sizeof(glm::vec3), nullptr, GL_DYNAMIC_DRAW);
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+}
+
+void Base3D::draw(GLint locModel, GLint colorLoc) const{
     if (VAO == 0) {
-        std::cerr << "Warning: Attempting to draw uninitialized object\n";
+        std::cerr << "Warning: Attempting to draw uninitialized object (Base3d)\n";
         throw;
     }
+    glUniformMatrix4fv(locModel, 1, GL_FALSE, glm::value_ptr(model));
+    // glUniform3f(colorLoc, 1.0f, 1.0f, 0.2f);
+    glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
     glBindVertexArray(0);
 }
 
+void Locus::draw(GLint locModel, GLint colorLoc) const{
+    if (VAO == 0) {
+        std::cerr << "Warning: Attempting to draw uninitialized object (Locus)\n";
+        throw;
+    }
+    if (vertices.size() > 1) {
+            glBindBuffer(GL_COPY_WRITE_BUFFER, VBO);
+            glBufferSubData(GL_COPY_WRITE_BUFFER, 0, vertices.size() * sizeof(glm::vec3), vertices.data());
+            
+            glUniformMatrix4fv(locModel, 1, GL_FALSE, glm::value_ptr(model));
+            // glUniform3f(colorLoc, 0.5f, 0.8f, 0.2f);  // greenish
+            glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+            
+            glBindVertexArray(VAO);
+            glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)vertices.size());
+            glBindVertexArray(0);
+    }
+}
+
+void Locus::updateLocus(glm::vec3& interpolated_position){
+    if (vertices.empty() || glm::distance(vertices.back(), interpolated_position) > 0.05f) {
+				vertices.push_back(interpolated_position);
+				if (vertices.size() > MAX_TRAJECTORY_POINTS) {
+					vertices.erase(vertices.begin());
+				}
+			}
+}
 
 Base3D::~Base3D(){
     if (VAO) glDeleteBuffers(1, &VBO);
@@ -54,7 +110,7 @@ Base3D::~Base3D(){
     if (VAO) glDeleteVertexArrays(1, &VAO);
 }
 
-Sphere::Sphere(std::array<float, 3>&& c, float r, unsigned int res)
+Sphere::Sphere(float r, unsigned int res, glm::vec3&& c)
     : Base3D(), center(std::move(c)), radius(r), resolution(res) {
 
         if (resolution == 0) {
@@ -65,6 +121,14 @@ Sphere::Sphere(std::array<float, 3>&& c, float r, unsigned int res)
         setupBuffers();
         
 }
+
+Locus::Locus() {
+        VAO = 0;
+        VBO = 0;
+        color = glm::vec3(0.5f, 0.8f, 0.2f);
+        model = glm::mat4(1.0f);
+        setupBuffers();
+    }
 
 // //override
 // void Sphere::draw() const{}
@@ -101,9 +165,7 @@ void Sphere::generateGeometry() {
             float x = xy * cosf(sectorAngle);
             float y = xy * sinf(sectorAngle);
 
-            vertices.push_back(x + center[0]);
-            vertices.push_back(y + center[1]);
-            vertices.push_back(z + center[2]);
+            vertices.push_back(glm::vec3(x, y, z) + center);
         }
     }
 

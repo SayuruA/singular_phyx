@@ -4,21 +4,56 @@
 
 #include <glad/glad.h>
 #include <GLFW3/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <vector>
 #include <array>
 #include <cmath>
 #include <cstdint>
 
-class Base3D {
+class RenderObj{
 protected:
-    std::vector<float> vertices;
+    std::vector<glm::vec3> vertices;
+    unsigned int VAO, VBO = 0;
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+
+
+public:
+    virtual void draw(GLint locModel, GLint colorLoc) const = 0;
+    virtual void setupBuffers() = 0;
+    void updateModel(glm::mat4 mod);
+    void updateColor(glm::vec3 col);
+};
+
+class Locus: public RenderObj{
+private:
+    size_t MAX_TRAJECTORY_POINTS = 500; 
+public:
+    Locus();
+
+    void draw(GLint locModel, GLint colorLoc) const override final;
+    void setupBuffers() override final;
+    void updateLocus(glm::vec3& interpolated_position);
+};
+
+
+class Base3D: public RenderObj {
+protected:
+    
+    unsigned int EBO;
     std::vector<unsigned int> indices;
 
-    unsigned int VAO, VBO, EBO;
-
     // do not change as 0 initialization is required
-    Base3D() : VAO(0), VBO(0), EBO(0) {}
+    Base3D(){
+        VAO = 0;
+        VBO = 0;
+        EBO = 0;
+        color = glm::vec3(1.0f, 1.0f, 0.2f);
+        model = glm::mat4(1.0f);
+    }
     virtual void generateGeometry() = 0;  // pure virt
 
     void setupBuffers();                  // shared
@@ -26,25 +61,22 @@ public:
     // Base3D();                               // calls generateGeometry + setupBuffers
     virtual ~Base3D();
 
-    virtual void draw() const;            // virt, need not be ovridn
+    void draw(GLint locModel, GLint colorLoc) const override;            // use "final" if no further overriding required
 };
 
 
 class Sphere : public Base3D {
 protected:
 
-    std::array<float, 3> center; 
+    glm::vec3 center; 
     float radius; 
     unsigned int resolution;
 
     // void draw() const override;
-    void generateGeometry() override;
+    void generateGeometry() override final;
 
 public:
-    Sphere(
-        std::array<float, 3>&& c, 
-        float r, 
-        unsigned int res);
+    Sphere(float r = 0.2, unsigned int res = 15, glm::vec3&& c = glm::vec3(0.f));
 };
 
 #endif
