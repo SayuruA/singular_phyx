@@ -92,12 +92,23 @@ public:
 			// compute force
             float dist = glm::length(obj->position - gravity_point);
             float dist2 = dist * dist + 1e-6;
-			glm::vec3 gravity = -glm::normalize(obj->position - gravity_point) * GM /dist2;
-			obj->force += obj->mass * gravity; // apply a force
 
-			// update state
-			obj->velocity += obj->force / obj->mass * dt;
-			obj->position += obj->velocity * dt;
+			// check if the object is too close to point of gravity
+			if (dist >= 0.01){
+				glm::vec3 gravity = -glm::normalize(obj->position - gravity_point) * GM /dist2;
+				obj->force += obj->mass * gravity; // apply a force
+				// update state
+				obj->velocity += obj->force / obj->mass * dt;
+				obj->position += obj->velocity * dt;
+			//..if too close
+			}else{
+				obj->position = glm::vec3(0.0f);
+				obj->velocity = glm::vec3(0.0f);
+			}
+
+			
+
+			
 
 			glm::quat deltaRotation = glm::quat(obj->ang_velocity * dt);
 			obj->orientation = glm::normalize(obj->orientation * deltaRotation);
