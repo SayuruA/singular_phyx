@@ -1,14 +1,17 @@
-# A Naive Attempt at Playing God — or Simply a Physics Engine from Scratch
+# A Naive Attempt at Playing God — or simply, a Physics Engine from Scratch
 
 I’ve always wanted to derive equations that explain why orbits collapse into elliptical paths rather than perfect circles, but I never quite got there. Now that I know how to code a little, I decided to cheat 😉.
 
-![Demo video](./demo/Orbits.gif)
+<figure style="text-align: center;">
+  <img src="./demo/Orbits.gif" alt="Orbits Demo" style="width:80%">
+  <figcaption>
+    **All planets are initialized with different (random) velocities and evolve under Newtonian gravity. As a result, they naturally follow elliptical orbits rather than circular ones.** 
+  </figcaption>
+</figure>
 
 ## Description
 
-All planets are initialized with different (random) velocities and evolve under Newtonian gravity. As a result, they naturally follow elliptical orbits rather than circular ones.
-
-This project is essentially a small physics engine built from scratch, coupled with a minimal rendering pipeline to visualize orbital motion.
+This project is essentially a C++ based small physics engine built from **scratch**, coupled with a rendering pipeline to visualize dynamic systems.
 
 ## Tech Stack
 
@@ -24,7 +27,6 @@ This project is essentially a small physics engine built from scratch, coupled w
 As of 12/25, the engine can simulate a simple solar system with multiple planets interacting via gravity. There’s still a lot of room to improve both the physics accuracy and the overall architecture.
 
 ### To Do
-- Improve numerical stability and integration methods  
 - Add collision handling  
 - Better abstractions for forces and bodies  
 - Performance optimizations  
@@ -41,9 +43,9 @@ If you’re interested in building something similar, these resources are great 
 - [OpenGL Basics](https://learnopengl.com/Getting-started/OpenGL)  
 - [Collision Detection Algorithms and More](https://winter.dev/articles/physics-engine)  
 
-## Lacking Motivation?
+## Still Lacking Motivation?
 
 - [Simulating Black Holes in C++ — kavan](https://www.youtube.com/watch?v=8-B6ryuBkCM)  
-- [Designing a Physics Engine](https://winter.dev/articles/physics-engine)
+- [Designing a Physics Engine - Iain Winter](https://winter.dev/articles/physics-engine)
 
 ---
