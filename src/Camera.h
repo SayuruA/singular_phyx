@@ -16,6 +16,10 @@ private:
     double last_mouse_y = 0.0;
     bool right_mouse_pressed = false;
     
+    // Momentum/inertia tracking
+    glm::vec3 pan_velocity = glm::vec3(0.0f);
+    float damping = 0.99f;  // Damping factor (0-1), lower = faster decay
+    
     // Sensitivity parameters
     float pan_sensitivity = 0.02f;
     float zoom_sensitivity = 0.5f;
@@ -45,16 +49,24 @@ public:
             double delta_x = mouse_x - last_mouse_x;
             double delta_y = mouse_y - last_mouse_y;
             
-            std::cout << "Panning with delta: (" << delta_x << ", " << delta_y << ")\n";
-            
             // Pan camera based on mouse movement
             glm::vec3 forward = glm::normalize(position - target);
             glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward));
             glm::vec3 up = glm::cross(forward, right);
             
+            // Calculate velocity from mouse movement
+            pan_velocity = right * (float)delta_x * pan_sensitivity + up * (float)(-delta_y) * pan_sensitivity;
+            
             // Apply panning
-            position += right * (float)delta_x * pan_sensitivity;
-            position += up * (float)(-delta_y) * pan_sensitivity;
+            position += pan_velocity;
+        } else {
+            // Apply momentum when mouse is released
+            if (glm::length(pan_velocity) > 0.001f) {
+                position += pan_velocity;
+                pan_velocity *= damping;  // Decay the velocity over time
+            } else {
+                pan_velocity = glm::vec3(0.0f);  // Stop when velocity is negligible
+            }
         }
         
         last_mouse_x = mouse_x;
