@@ -104,7 +104,7 @@ void Locus::updateLocus(glm::vec3& interpolated_position){
 }
 
 Base3D::~Base3D(){
-    if (VAO) glDeleteBuffers(1, &VBO);
+    // if (VAO) glDeleteBuffers(1, &VBO);
     if (VBO) glDeleteBuffers(1, &VBO);
     if (EBO) glDeleteBuffers(1, &EBO);
     if (VAO) glDeleteVertexArrays(1, &VAO);
@@ -112,7 +112,7 @@ Base3D::~Base3D(){
 }
 
 Locus::~Locus(){
-    if (VAO) glDeleteBuffers(1, &VBO);
+    // if (VAO) glDeleteBuffers(1, &VBO);
     if (VBO) glDeleteBuffers(1, &VBO);
     if (VAO) glDeleteVertexArrays(1, &VAO);
     std::cout << "Locus buffer deleted successfully\n";
