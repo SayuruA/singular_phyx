@@ -1,4 +1,4 @@
-#ifndef MY_SHADERG_RPX_ENG
+#ifndef MY_SHADER_GRPX_ENG
 #define MY_SHADER_GRPX_ENG
 
 #include <string>

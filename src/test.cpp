@@ -18,6 +18,7 @@
 #include "Objects.h"
 #include "myUtils.h"
 #include "phyx.h"
+#include "Camera.h"
 
 int main() {
     // std::cout << "WTF??";
@@ -94,7 +95,14 @@ int main() {
     for (auto& planet : orbiting_planets) {
         c_objects.push_back(&planet);
     }
-    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -12.0f));
+    
+    // Create camera with initial position
+    Camera camera(glm::vec3(-6.0f, 4.0f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    
+    // Set up global camera pointer for callback
+    g_camera = &camera;
+    
+    glm::mat4 view = camera.getViewMatrix();
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 
                                                 800.0f / 600.0f, 
                                                 0.1f, 100.0f);
@@ -108,6 +116,12 @@ int main() {
         std::cerr << "Failed to create shader program\n";
         return -1;
     }
+
+    // Set up scroll callback for camera zoom
+    glfwSetScrollCallback(window, mouseScrollCallback);
+    
+    // Set up mouse button callback for camera panning
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
 
     // get uniform locations
     GLint locModel = glGetUniformLocation(shader3d.getID(), "model");
@@ -127,6 +141,10 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
 
         glfwPollEvents();
+        
+        // Update camera based on mouse input
+        camera.updateMouse(window);
+        
         // compute simple transforms
         float time = (float)glfwGetTime();
         
@@ -146,6 +164,11 @@ int main() {
 
         // draw
         shader3d.use();
+        
+        // Update view matrix from camera
+        view = camera.getViewMatrix();
+        universe.update_camera(view, projection);
+        
         // send matrices (column-major order); 1 = count; GL_FALSE = do not transpose
         // Create transformation matrices
         float timeValue = glfwGetTime();

@@ -135,7 +135,7 @@ Sphere::Sphere(float r, unsigned int res, glm::vec3&& c, glm::vec3&& col)
 Locus::Locus() {
         VAO = 0;
         VBO = 0;
-        color = glm::vec3(0.5f, 0.8f, 0.2f);
+        color = glm::vec3(0.8f, 0.8f, 0.8f);
         model = glm::mat4(1.0f);
         setupBuffers();
     }
