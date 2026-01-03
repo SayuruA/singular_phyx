@@ -40,9 +40,9 @@ struct Celestial{
 
 	Celestial(glm::vec3& start_pos, 
 				glm::vec3& start_vel, float mass, 
-				float r, bool track){
+					float r, bool track, glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f)){
 
-		renderable.reset(new Sphere(r));
+		renderable.reset(new Sphere(r, 15, std::move(glm::vec3(0.0f)), std::move(color)));
 		physObj.reset(new PhysObj(start_pos, start_vel, mass));
 		track_locus = track;
 		locus.reset(new Locus());

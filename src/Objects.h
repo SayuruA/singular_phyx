@@ -81,7 +81,7 @@ protected:
     void generateGeometry() override final;
 
 public:
-    Sphere(float r = 0.2, unsigned int res = 15, glm::vec3&& c = glm::vec3(0.f));
+    Sphere(float r = 0.2, unsigned int res = 15, glm::vec3&& c = glm::vec3(0.f), glm::vec3&& col = glm::vec3(1.0f, 1.0f, 1.0f));
 };
 
 #endif

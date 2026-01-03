@@ -55,31 +55,37 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 
-
-    {
-
+    { // define celestials and shaders inside this scope to have their destructors called at the end.
     glm::vec3 start_pos1 = glm::vec3(-3.0f, 0.0f, 0.0f);
     glm::vec3 start_vel1 = glm::vec3(0.0f, 0.7f, 0.0f);
     float mass1 = 1.0f;
     float radius1 = 0.1f;
-    Celestial c_earth = Celestial(start_pos1, start_vel1, mass1, radius1, true);
+    glm::vec3 earth_color = glm::vec3(0.2f, 0.5f, 0.8f); // Blue
+    Celestial c_earth = Celestial(start_pos1, start_vel1, mass1, radius1, true, earth_color);
 
     // Create a set of orbiting planets at the same location as c_earth but at different speeds
     std::vector<Celestial> orbiting_planets;
-    float speeds[] = {0.5f, 0.9f, 1.2f, 1.5f};
-    float masses[] = {0.8f, 1.2f, 0.6f, 1.0f};
+    float speeds[] = {0.6f, 0.9f, 1.2f, 1.5f};
+    float masses[] = {0.8f, 1.2f, 0.6f, 10.0f};
     float radii[] = {0.08f, 0.12f, 0.07f, 0.10f};
+    glm::vec3 planet_colors[] = {
+        glm::vec3(0.8f, 0.3f, 0.2f), // Red
+        glm::vec3(0.3f, 0.8f, 0.3f), // Green
+        glm::vec3(0.8f, 0.8f, 0.2f), // Yellow
+        glm::vec3(0.6f, 0.2f, 0.8f)  // Purple
+    };
     
     for (int i = 0; i < 4; ++i) {
         glm::vec3 planet_vel = glm::vec3(0.0f, speeds[i], 0.0f);
-        orbiting_planets.emplace_back(start_pos1, planet_vel, masses[i], radii[i], true);
+        orbiting_planets.emplace_back(start_pos1, planet_vel, masses[i], radii[i], true, planet_colors[i]);
     }
 
     glm::vec3 start_pos2 = glm::vec3(0.0f,0.0f,0.0f);
     glm::vec3 start_vel2 = glm::vec3(0.0f,0.0f,0.0f);
     float mass2 = 1e5;
     float radius2 = 0.3f;
-    Celestial c_sun = Celestial(start_pos2, start_vel2, mass2, radius2, true);
+    glm::vec3 sun_color = glm::vec3(1.0f, 0.6f, 0.0f); // Orange
+    Celestial c_sun = Celestial(start_pos2, start_vel2, mass2, radius2, true, sun_color);
 
     // create physics universe with gravity point at origin
     std::vector<Celestial*> c_objects = {&c_sun, &c_earth};
@@ -88,7 +94,7 @@ int main() {
     for (auto& planet : orbiting_planets) {
         c_objects.push_back(&planet);
     }
-    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.0f, -12.0f));
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -12.0f));
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 
                                                 800.0f / 600.0f, 
                                                 0.1f, 100.0f);

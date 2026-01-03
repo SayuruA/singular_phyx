@@ -119,13 +119,14 @@ Locus::~Locus(){
 
 }
 
-Sphere::Sphere(float r, unsigned int res, glm::vec3&& c)
+Sphere::Sphere(float r, unsigned int res, glm::vec3&& c, glm::vec3&& col)
     : Base3D(), center(std::move(c)), radius(r), resolution(res) {
 
         if (resolution == 0) {
             throw std::invalid_argument("Resolution must be > 0");
         }
 
+        color = std::move(col);
         generateGeometry();
         setupBuffers();
         
