@@ -1,17 +1,22 @@
 # A Naive Attempt at Playing God — or simply, a Physics Engine from Scratch
 
-I’ve always wanted to derive equations that explain why orbits collapse into elliptical paths rather than perfect circles, but I never quite got there. Now that I know how to code a little, I decided to cheat 😉.
+I’ve always wanted to derive equations that explain why orbits collapse into elliptical paths rather than perfect circles, but I never quite got there. Now that I know how to code a little, I decided to cheat 😉. This project is essentially a C++ based small physics engine built from **scratch**, coupled with a rendering pipeline to visualize dynamic systems.
 
-<figure style="text-align: center;">
-  <img src="./demo/Orbits.gif" alt="Orbits Demo" style="width:80%">
-  <figcaption>
-    **All planets are initialized with different (random) velocities and evolve under Newtonian gravity. As a result, they naturally follow elliptical orbits rather than circular ones.** 
-  </figcaption>
-</figure>
+<br>
 
-## Description
+<div align="center" style="display: block;">
+  <div style="width: 80%;">
+    <img src="./demo/Orbits.gif" alt="Orbits Demo" width="100%">
+    <p>
+      <strong>
+        All planets are initialized with different (random) velocities and evolve under Newtonian gravity.
+        As a result, they naturally follow elliptical orbits rather than circular ones.
+      </strong>
+    </p>
+  </div>
+</div>
 
-This project is essentially a C++ based small physics engine built from **scratch**, coupled with a rendering pipeline to visualize dynamic systems.
+
 
 ## Tech Stack
 
